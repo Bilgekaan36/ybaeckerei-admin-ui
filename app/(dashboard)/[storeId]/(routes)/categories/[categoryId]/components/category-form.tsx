@@ -1,18 +1,17 @@
-"use client";
+'use client';
 
-import * as z from "zod";
-import axios from "axios";
-import { useState } from "react";
-import { Billboard, Category } from "@prisma/client";
-import { Trash } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams, useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import * as z from 'zod';
+import axios from 'axios';
+import { useState } from 'react';
+import { Trash } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useParams, useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
-import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
-import { Separator } from "@/components/ui/separator";
+import { Button } from '@/registry/default/ui/button';
+import { Heading } from '@/components/ui/heading';
+import { Separator } from '@/registry/default/ui/separator';
 import {
   Form,
   FormControl,
@@ -20,27 +19,29 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { AlertModal } from "@/components/modals/alert-modal";
+} from '@/registry/default/ui/form';
+import { Input } from '@/registry/new-york/ui/input';
+import { AlertModal } from '@/components/modals/alert-modal';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/registry/new-york/ui/select';
+import { BillboardColumn } from '../../../billboards/components/columns';
+import { CategoryColumn } from '../../components/columns';
 
 const formSchema = z.object({
-  name: z.string().min(1),
+  categoryName: z.string().min(1),
   billboardId: z.string().min(1),
 });
 
 type CategoryFormValues = z.infer<typeof formSchema>;
 
 interface CategoryFormProps {
-  initialData: Category | null;
-  billboards: Billboard[];
+  initialData: CategoryColumn | null;
+  billboards: BillboardColumn[];
 }
 
 export const CategoryForm: React.FC<CategoryFormProps> = ({
@@ -53,16 +54,17 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const title = initialData ? "Edit category" : "Create category";
-  const description = initialData ? "Edit a category" : "Add a new category";
-  const toastMessage = initialData ? "Category updated." : "Category created.";
-  const action = initialData ? "Save changes" : "Create";
+  const title = initialData ? 'Edit category' : 'Create category';
+  const description = initialData ? 'Edit a category' : 'Add a new category';
+  const toastMessage = initialData ? 'Category updated.' : 'Category created.';
+  const action = initialData ? 'Save changes' : 'Create';
 
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(formSchema),
+    //@ts-ignore
     defaultValues: initialData || {
-      name: "",
-      billboardId: "",
+      categoryName: '',
+      billboardId: '',
     },
   });
 
@@ -70,18 +72,24 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     try {
       setLoading(true);
       if (initialData) {
-        await axios.patch(
-          `/api/${params.storeId}/categories/${params.categoryId}`,
-          data
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_COMMANDS_SERVICE_API_URL}/administration/editCategory`,
+          {
+            categoryName: data.categoryName,
+            billboardId: params.billboardId,
+          }
         );
       } else {
-        await axios.post(`/api/${params.storeId}/categories`, data);
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_COMMANDS_SERVICE_API_URL}/registration/register-category`,
+          data
+        );
       }
       router.refresh();
       router.push(`/${params.storeId}/categories`);
       toast.success(toastMessage);
     } catch (error) {
-      toast.error("Something went wrong.");
+      toast.error('Something went wrong.');
     } finally {
       setLoading(false);
     }
@@ -95,10 +103,10 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       );
       router.refresh();
       router.push(`/${params.storeId}/categories`);
-      toast.success("Category deleted.");
+      toast.success('Category deleted.');
     } catch (error) {
       toast.error(
-        "Make sure you removed all products using this category first."
+        'Make sure you removed all products using this category first.'
       );
     } finally {
       setLoading(false);
@@ -136,8 +144,8 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
           <div className='grid grid-cols-3 gap-8'>
             <FormField
               control={form.control}
-              name='name'
-              render={({ field }) => (
+              name='categoryName'
+              render={({ field }: any) => (
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
@@ -154,7 +162,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
             <FormField
               control={form.control}
               name='billboardId'
-              render={({ field }) => (
+              render={({ field }: any) => (
                 <FormItem>
                   <FormLabel>Billboard</FormLabel>
                   <Select
@@ -173,8 +181,13 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                     </FormControl>
                     <SelectContent>
                       {billboards.map((billboard) => (
-                        <SelectItem key={billboard.id} value={billboard.id}>
-                          {billboard.label}
+                        <SelectItem
+                          key={billboard.billboardId}
+                          value={
+                            billboard.billboardId ? billboard.billboardId : ''
+                          }
+                        >
+                          {billboard.billboardTitle}
                         </SelectItem>
                       ))}
                     </SelectContent>

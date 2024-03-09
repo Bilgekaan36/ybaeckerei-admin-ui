@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
-import toast from "react-hot-toast";
-import { useParams, useRouter } from "next/navigation";
+import { Copy, Edit, MoreHorizontal, Trash } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useParams, useRouter } from 'next/navigation';
 
 import {
   DropdownMenu,
@@ -10,39 +10,43 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { CategoryColumn } from "./columns";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import axios from "axios";
-import { AlertModal } from "@/components/modals/alert-modal";
+} from '@/registry/default/ui/dropdown-menu';
+import { CategoryColumn } from './columns';
+import { Button } from '@/registry/default/ui/button';
+import { useState } from 'react';
+import axios from 'axios';
+import { AlertModal } from '@/components/modals/alert-modal';
 
 interface CellActionProps {
-  data: CategoryColumn;
+  data: any;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useRouter();
   const params = useParams();
-
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Billboard Id copied to clipboard.");
+    toast.success('Billboard Id copied to clipboard.');
   };
 
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/categories/${data.id}`);
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_COMMANDS_SERVICE_API_URL}/administration/removeCategory`,
+        {
+          categoryId: data.id,
+        }
+      );
       router.refresh();
-      toast.success("Category deleted.");
+      toast.success('Category deleted.');
     } catch (error) {
       console.log(error);
       toast.error(
-        "Make sure you removed all products using this category first."
+        'Make sure you removed all products using this category first.'
       );
     } finally {
       setLoading(false);

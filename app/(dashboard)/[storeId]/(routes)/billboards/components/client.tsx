@@ -12,9 +12,7 @@ import { ApiList } from '@/components/ui/api-list';
 import React, { useEffect } from 'react';
 import { useBillboardEventStore } from '@/events/billboard-event-store';
 
-interface BillboardClientProps {
-  data: BillboardColumn[];
-}
+
 
 const BillboardClient: React.FC = () => {
   const router = useRouter();
