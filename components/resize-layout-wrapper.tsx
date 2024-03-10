@@ -25,7 +25,7 @@ import {
   ResizablePanelGroup,
 } from '@/registry/new-york/ui/resizable';
 import StoreSwitcher from '@/components/store-switcher';
-import { useBillboardEventStore } from '@/events/billboard-event-store';
+import { useBillboardEventStore } from '@/event-stores/billboard-event-store';
 
 interface ResizeLayoutWrapperProps {
   accounts: {

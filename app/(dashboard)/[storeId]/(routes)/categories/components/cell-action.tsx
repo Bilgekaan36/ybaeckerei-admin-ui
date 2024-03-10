@@ -18,7 +18,7 @@ import axios from 'axios';
 import { AlertModal } from '@/components/modals/alert-modal';
 
 interface CellActionProps {
-  data: any;
+  data: CategoryColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -38,7 +38,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       await axios.post(
         `${process.env.NEXT_PUBLIC_COMMANDS_SERVICE_API_URL}/administration/removeCategory`,
         {
-          categoryId: data.id,
+          categoryId: data.categoryId,
         }
       );
       router.refresh();
@@ -71,13 +71,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => onCopy(data.id)}>
+          <DropdownMenuItem onClick={() => onCopy(data.categoryId)}>
             <Copy className='mr-2 h-4 w-4' />
             Copy Id
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
-              router.push(`/${params.storeId}/categories/${data.id}`)
+              router.push(`/${params.storeId}/categories/${data.categoryId}`)
             }
           >
             <Edit className='mr-2 h-4 w-4' />

@@ -41,8 +41,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         billboardId: data.billboardId,
       }
     );
-    setLoading(false);
+    toast.success('Billboard deleted.');
+    router.refresh();
     setOpen(false);
+    setLoading(false);
   };
 
   return (

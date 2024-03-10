@@ -9,7 +9,7 @@ import { Separator } from '@/registry/default/ui/separator';
 import { CategoryColumn, columns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
 import { ApiList } from '@/components/ui/api-list';
-import { useCategoriesEventStore } from '@/events/category-event-store';
+import { useCategoriesEventStore } from '@/event-stores/category-event-store';
 import { useEffect } from 'react';
 
 export const CategoryClient: React.FC = () => {

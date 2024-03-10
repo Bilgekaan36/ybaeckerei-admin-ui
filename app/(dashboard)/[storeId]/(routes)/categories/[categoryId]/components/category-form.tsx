@@ -98,8 +98,11 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(
-        `/api/${params.storeId}/categories/${params.categoryId}`
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_COMMANDS_SERVICE_API_URL}/administration/removeCategory`,
+        {
+          categoryId: params.categoryId,
+        }
       );
       router.refresh();
       router.push(`/${params.storeId}/categories`);

@@ -6,17 +6,17 @@ import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/registry/default/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { AlertModal } from "@/components/modals/alert-modal";
+} from '@/registry/default/ui/dropdown-menu';
+import { AlertModal } from '@/components/modals/alert-modal';
 
-import { SizeColumn } from "./columns";
+import { SizeColumn } from './columns';
 
 interface CellActionProps {
   data: SizeColumn;
@@ -28,23 +28,23 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const onConfirm = async () => {
-    try {
-      setLoading(true);
-      await axios.delete(`/api/${params.storeId}/sizes/${data.id}`);
-      toast.success("Size deleted.");
-      router.refresh();
-    } catch (error) {
-      toast.error("Make sure you removed all products using this size first.");
-    } finally {
-      setOpen(false);
-      setLoading(false);
-    }
+  const onCopy = (id: any) => {
+    navigator.clipboard.writeText(id);
+    toast.success('Size ID copied to clipboard.');
   };
 
-  const onCopy = (id: string) => {
-    navigator.clipboard.writeText(id);
-    toast.success("Size ID copied to clipboard.");
+  const onDelete = async () => {
+    setLoading(true);
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_COMMANDS_SERVICE_API_URL}/administration/removeSize`,
+      {
+        sizeId: data.sizeId,
+      }
+    );
+    toast.success('Size deleted.');
+    router.refresh();
+    setOpen(false);
+    setLoading(false);
   };
 
   return (
@@ -52,7 +52,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onConfirm={onConfirm}
+        onConfirm={onDelete}
         loading={loading}
       />
       <DropdownMenu>
@@ -64,11 +64,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => onCopy(data.id)}>
-            <Copy className='mr-2 h-4 w-4' /> Copy Id
+          <DropdownMenuItem onClick={() => onCopy(data.sizeId)}>
+            <Copy className='mr-2 h-4 w-4' /> Copy sizeId
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => router.push(`/${params.storeId}/sizes/${data.id}`)}
+            onClick={() =>
+              router.push(`/${params.storeId}/sizes/${data.sizeId}`)
+            }
           >
             <Edit className='mr-2 h-4 w-4' /> Update
           </DropdownMenuItem>

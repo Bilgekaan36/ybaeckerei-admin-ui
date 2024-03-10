@@ -4,27 +4,27 @@ import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 
 export type SizeColumn = {
-  id: string;
-  name: string;
-  value: string;
+  sizeId?: string;
+  sizeValue: number;
+  sizeType: string;
   createdAt: string;
 };
 
 export const columns: ColumnDef<SizeColumn>[] = [
   {
-    accessorKey: "name",
-    header: "Name",
+    accessorKey: 'sizeValue',
+    header: 'Value',
   },
   {
-    accessorKey: "value",
-    header: "Value",
+    accessorKey: 'sizeType',
+    header: 'Type',
   },
   {
-    accessorKey: "createdAt",
-    header: "Date",
+    accessorKey: 'createdAt',
+    header: 'Date',
   },
   {
-    id: "actions",
+    id: 'actions',
     cell: ({ row }) => <CellAction data={row.original} />,
   },
 ];

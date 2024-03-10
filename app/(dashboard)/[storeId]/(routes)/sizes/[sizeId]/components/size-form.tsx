@@ -2,17 +2,16 @@
 
 import * as z from "zod";
 import axios from "axios";
-import { useState } from "react";
-import { Size } from "@prisma/client";
-import { Trash } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams, useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { useState } from 'react';
+import { Trash } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useParams, useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
-import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
-import { Separator } from "@/components/ui/separator";
+import { Button } from '@/registry/default/ui/button';
+import { Heading } from '@/components/ui/heading';
+import { Separator } from '@/registry/default/ui/separator';
 import {
   Form,
   FormControl,
@@ -20,19 +19,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { AlertModal } from "@/components/modals/alert-modal";
+} from '@/registry/default/ui/form';
+import { Input } from '@/registry/new-york/ui/input';
+import { AlertModal } from '@/components/modals/alert-modal';
+import { SizeColumn } from '../../components/columns';
 
 const formSchema = z.object({
-  name: z.string().min(1),
-  value: z.string().min(1),
+  sizeValue: z.string().min(1),
+  sizeType: z.string().min(1),
 });
 
 type SizeFormValues = z.infer<typeof formSchema>;
 
 interface SizeFormProps {
-  initialData: Size | null;
+  initialData: SizeColumn | null;
 }
 
 export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
@@ -42,16 +42,17 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const title = initialData ? "Edit size" : "Create size";
-  const description = initialData ? "Edit a size" : "Add a new size";
-  const toastMessage = initialData ? "Size updated." : "Size created.";
-  const action = initialData ? "Save changes" : "Create";
+  const title = initialData ? 'Edit size' : 'Create size';
+  const description = initialData ? 'Edit a size' : 'Add a new size';
+  const toastMessage = initialData ? 'Size updated.' : 'Size created.';
+  const action = initialData ? 'Save changes' : 'Create';
 
   const form = useForm<SizeFormValues>({
     resolver: zodResolver(formSchema),
+    //@ts-ignore
     defaultValues: initialData || {
-      name: "",
-      value: "",
+      sizeValue: '',
+      sizeType: '',
     },
   });
 
@@ -59,18 +60,24 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
     try {
       setLoading(true);
       if (initialData) {
-        await axios.patch(
-          `/api/${params.storeId}/sizes/${params.sizeId}`,
-          data
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_COMMANDS_SERVICE_API_URL}/administration/editSize`,
+          {
+            sizeValue: data.sizeValue,
+            sizeType: data.sizeType,
+          }
         );
       } else {
-        await axios.post(`/api/${params.storeId}/sizes`, data);
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_COMMANDS_SERVICE_API_URL}/registration/register-size`,
+          data
+        );
       }
       router.refresh();
       router.push(`/${params.storeId}/sizes`);
       toast.success(toastMessage);
     } catch (error) {
-      toast.error("Something went wrong.");
+      toast.error('Something went wrong.');
     } finally {
       setLoading(false);
     }
@@ -79,12 +86,17 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/sizes/${params.sizeId}`);
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_COMMANDS_SERVICE_API_URL}/administration/removeSize`,
+        {
+          sizeId: params.sizeId,
+        }
+      );
       router.refresh();
       router.push(`/${params.storeId}/sizes`);
-      toast.success("Size deleted.");
+      toast.success('Size deleted.');
     } catch (error) {
-      toast.error("Make sure you removed all products using this size first.");
+      toast.error('Make sure you removed all products using this size first.');
     } finally {
       setLoading(false);
       setOpen(false);
@@ -121,14 +133,14 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
           <div className='grid grid-cols-3 gap-8'>
             <FormField
               control={form.control}
-              name='name'
+              name='sizeValue'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Value</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder='Size name'
+                      placeholder='Size value'
                       {...field}
                     />
                   </FormControl>
@@ -138,14 +150,14 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
             />
             <FormField
               control={form.control}
-              name='value'
+              name='sizeType'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Value</FormLabel>
+                  <FormLabel>Type</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder='Size value'
+                      placeholder='Size type'
                       {...field}
                     />
                   </FormControl>

@@ -10,7 +10,7 @@ import { BillboardColumn, columns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
 import { ApiList } from '@/components/ui/api-list';
 import React, { useEffect } from 'react';
-import { useBillboardEventStore } from '@/events/billboard-event-store';
+import { useBillboardEventStore } from '@/event-stores/billboard-event-store';
 
 
 
